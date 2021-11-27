@@ -1,37 +1,37 @@
 .cseg
 delay_1u: 
-	LOAD delay_reg1u, 23
+	load delay_reg1u, 23
 wait_1u: 
-	SUB delay_reg1u, 1
-	JUMP NZ, wait_1u
-	LOAD delay_reg1u, delay_reg1u 
-	LOAD delay_reg1u, delay_reg1u 
-	RET
+	sub delay_reg1u, 1
+	jump nz, wait_1u
+	load delay_reg1u, delay_reg1u 
+	load delay_reg1u, delay_reg1u 
+	ret
 
 delay_40u: 
-	LOAD delay_reg40u, 38
+	load delay_reg40u, 38
 wait_40u: 
-	CALL delay_1u
-	SUB delay_reg40u, 1
-	JUMP NZ, wait_40u
-	RET
+	call delay_1u
+	sub delay_reg40u, 1
+	jump nz, wait_40u
+	ret
 
 delay_1m: 
-	LOAD delay_reg1m, 25
+	load delay_reg1m, 25
 wait_1m: 
-	CALL delay_40u
-	SUB delay_reg1m, 1
-	JUMP NZ, wait_1m
-	RET
+	call delay_40u
+	sub delay_reg1m, 1
+	jump nz, wait_1m
+	ret
 
 delay_m: 
-	CALL delay_1m
-	SUB delay_counter, 1
-	JUMP NZ, delay_m
-	RET
+	call delay_1m
+	sub delay_counter, 1
+	jump nz, delay_m
+	ret
 
 delay_u: 
-	CALL delay_1u
-	SUB delay_counter, 1
-	JUMP NZ, delay_u
-	RET
+	call delay_1u
+	sub delay_counter, 1
+	jump nz, delay_u
+	ret

@@ -1,5 +1,4 @@
 .cseg
-
 init_lcd:
 	;reset
 	load tmp, 0x38

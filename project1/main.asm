@@ -12,8 +12,8 @@
 .reg s5, dec1
 .reg s6, dec2
 
-.reg s7, temp_LSB
-.reg s8, temp_MSB
+.reg s7, temp_lsb
+.reg s8, temp_msb
 .reg s9, temp_bit
 
 .reg sB, counter
@@ -28,29 +28,30 @@ load one, 1
 call init_lcd
 
 main:
-call measure_temp
+	call measure_temp
 
-call unset_rs
-call clear_lcd
-call set_cursor
-call set_rs
+	call unset_rs
+	call clear_lcd
+	call set_cursor
+	call set_rs
 
-;test conv
-;load temp_LSB, 0b10100000
-;load temp_MSB, 0
-call temp_to_val
-call val_to_chars
+	;test conversion
+	;load temp_lsb, 0b10100000
+	;load temp_msb, 0
+	call temp_to_val
+	call val_to_chars
 
-load val, dec1
-call write_val_to_lcd
-load val, dec2
-call write_val_to_lcd
-load val, 0x20
-call write_val_to_lcd
-load val, 0x43
-call write_val_to_lcd
+	;eg. 12 C
+	load val, dec1
+	call write_val_to_lcd
+	load val, dec2
+	call write_val_to_lcd
+	load val, 0x20
+	call write_val_to_lcd
+	load val, 0x43
+	call write_val_to_lcd
 
-jump main
+	jump main
 
 .incl "time.asm"
 .incl "wire.asm"

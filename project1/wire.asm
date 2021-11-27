@@ -1,169 +1,167 @@
 .cseg
 measure_temp:
-CALL reset
-CALL presence
-CALL skip_rom
-CALL delay_1u
+	call reset
+	call presence
+	call skip_rom
+	call delay_1u
+	call convert_t
+	load delay_counter, 200
+	call delay_m
+	load delay_counter, 200
+	call delay_m
+	load delay_counter, 200
+	call delay_m
+	load delay_counter, 150
+	call delay_m
 
-CALL convert_t
-LOAD delay_counter, 200
-CALL delay_m
-LOAD delay_counter, 200
-CALL delay_m
-LOAD delay_counter, 200
-CALL delay_m
-LOAD delay_counter, 150
-CALL delay_m
+	call reset
+	call presence
+	call skip_rom
+	call delay_1u
+	call read_scratchpad
 
-CALL reset
-CALL presence
-CALL skip_rom
-CALL delay_1u
-
-CALL read_scratchpad
-
-CALL read_temperature
-RET
+	call read_temperature
+	ret
 
 reset:
-LOAD tmp, 1
-OUT tmp, gpio_B_dir
-LOAD tmp, 0
-OUT tmp, gpio_B
-LOAD delay_counter, 240
-CALL delay_u
-LOAD delay_counter, 240
-CALL delay_u
-RET
+	load tmp, 1
+	out tmp, gpio_B_dir
+	load tmp, 0
+	out tmp, gpio_B
+	load delay_counter, 240
+	call delay_u
+	load delay_counter, 240
+	call delay_u
+	ret
 
 presence:
-LOAD tmp, 0
-OUT tmp, gpio_B_dir
-LOAD delay_counter, 60
-CALL delay_u
-IN tmp, gpio_B
-LOAD delay_counter, 240
-CALL delay_u
-RET
+	load tmp, 0
+	out tmp, gpio_B_dir
+	load delay_counter, 60
+	call delay_u
+	in tmp, gpio_B
+	load delay_counter, 240
+	call delay_u
+	ret
 
 send_0:
-LOAD tmp, 1
-OUT tmp, gpio_B_dir
-LOAD tmp, 0
-OUT tmp, gpio_B
-LOAD delay_counter, 60
-CALL delay_u
-LOAD tmp, 0
-OUT tmp, gpio_B_dir
-CALL delay_1u
-RET
+	load tmp, 1
+	out tmp, gpio_B_dir
+	load tmp, 0
+	out tmp, gpio_B
+	load delay_counter, 60
+	call delay_u
+	load tmp, 0
+	out tmp, gpio_B_dir
+	call delay_1u
+	ret
 
 send_1:
-LOAD tmp, 1
-OUT tmp, gpio_B_dir
-LOAD tmp, 0
-OUT tmp, gpio_B
-LOAD delay_counter, 10
-CALL delay_u
-LOAD tmp, 0
-OUT tmp, gpio_B_dir
-LOAD delay_counter, 50
-CALL delay_u
-CALL delay_1u
-RET
+	load tmp, 1
+	out tmp, gpio_B_dir
+	load tmp, 0
+	out tmp, gpio_B
+	load delay_counter, 10
+	call delay_u
+	load tmp, 0
+	out tmp, gpio_B_dir
+	load delay_counter, 50
+	call delay_u
+	call delay_1u
+	ret
 
 skip_rom:
-CALL send_1
-CALL send_1
-CALL send_0
-CALL send_0
-CALL send_1
-CALL send_1
-CALL send_0
-CALL send_0
-RET
+	call send_1
+	call send_1
+	call send_0
+	call send_0
+	call send_1
+	call send_1
+	call send_0
+	call send_0
+	ret
 
 convert_t:
-CALL send_0
-CALL send_1
-CALL send_0
-CALL send_0
-CALL send_0
-CALL send_1
-CALL send_0
-CALL send_0
-RET
+	call send_0
+	call send_1
+	call send_0
+	call send_0
+	call send_0
+	call send_1
+	call send_0
+	call send_0
+	ret
 
 read_scratchpad:
-CALL send_1
-CALL send_0
-CALL send_1
-CALL send_1
-CALL send_1
-CALL send_1
-CALL send_1
-CALL send_0
-RET
+	call send_1
+	call send_0
+	call send_1
+	call send_1
+	call send_1
+	call send_1
+	call send_1
+	call send_0
+	ret
 
-read_one_bit_from_thermometer:
-LOAD tmp, 1
-OUT tmp, gpio_B_dir
-LOAD tmp, 0
-OUT tmp, gpio_B
-LOAD delay_counter, 1
-CALL delay_u
-LOAD tmp, 0
-OUT tmp, gpio_B_dir
-LOAD delay_counter, 5
-CALL delay_u
-IN temp_bit, gpio_B
-LOAD delay_counter, 55
-CALL delay_u
-RET
+read_one_temperature_bit:
+	load tmp, 1
+	out tmp, gpio_B_dir
+	load tmp, 0
+	out tmp, gpio_B
+	load delay_counter, 1
+	call delay_u
+	load tmp, 0
+	out tmp, gpio_B_dir
+	load delay_counter, 5
+	call delay_u
+	in temp_bit, gpio_B
+	load delay_counter, 55
+	call delay_u
+	ret
 
-read_from_thermometer_LSB:
-LOAD temp_LSB, 0
-LOAD counter, 0
-loop_read_LSB: 
-CALL read_one_bit_from_thermometer
-TEST temp_bit, 1
-JUMP Z, continue_LSB
-LOAD tmp, counter
-shift_loop_LSB:
-COMP tmp, 0
-JUMP Z, continue_LSB
-SL0 temp_bit
-SUB tmp, 1
-JUMP shift_loop_LSB
-continue_LSB:
-OR temp_LSB, temp_bit
-ADD counter, 1
-COMP counter, 8
-JUMP NZ, loop_read_LSB
-RET
+read_temperature_lsb:
+	load temp_lsb, 0
+	load counter, 0
+loop_read_lsb: 
+	call read_one_temperature_bit
+	test temp_bit, 1
+	jump z, continue_lsb
+	load tmp, counter
+shift_loop_lsb:
+	comp tmp, 0
+	jump z, continue_lsb
+	sl0 temp_bit
+	sub tmp, 1
+	jump shift_loop_lsb
+continue_lsb:
+	or temp_lsb, temp_bit
+	add counter, 1
+	comp counter, 8
+	jump nz, loop_read_lsb
+	ret
 
-read_from_thermometer_MSB:
-LOAD temp_MSB, 0
-LOAD counter, 0
-loop_read_MSB: 
-CALL read_one_bit_from_thermometer
-TEST temp_bit, 1
-JUMP Z, continue_MSB
-LOAD tmp, counter
-shift_loop_MSB:
-COMP tmp, 0
-JUMP Z, continue_MSB
-SL0 temp_bit
-SUB tmp, 1
-JUMP shift_loop_MSB
-continue_MSB:
-OR temp_MSB, temp_bit
-ADD counter, 1
-COMP counter, 8
-JUMP NZ, loop_read_MSB
-RET
+read_temperature_msb:
+	load temp_msb, 0
+	load counter, 0
+loop_read_msb: 
+	call read_one_temperature_bit
+	test temp_bit, 1
+	jump z, continue_msb
+	load tmp, counter
+shift_loop_msb:
+	comp tmp, 0
+	jump z, continue_msb
+	sl0 temp_bit
+	sub tmp, 1
+	jump shift_loop_msb
+continue_msb:
+	or temp_msb, temp_bit
+	add counter, 1
+	comp counter, 8
+	jump nz, loop_read_msb
+	ret
 
 read_temperature:
-CALL read_from_thermometer_LSB
-CALL read_from_thermometer_MSB
-RET
+	call read_temperature_lsb
+	call read_temperature_msb
+	ret

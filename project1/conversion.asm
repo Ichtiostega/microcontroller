@@ -12,18 +12,17 @@ val_to_chars:
 	fetch dec2, tmp
 	ret
 
-
 temp_to_val:
-	sr0 temp_LSB
-	sr0 temp_LSB
-	sr0 temp_LSB
-	sr0 temp_LSB
+	sr0 temp_lsb
+	sr0 temp_lsb
+	sr0 temp_lsb
+	sr0 temp_lsb
 
-	and temp_MSB, 0b01111111
-	sl0 temp_MSB
-	sl0 temp_MSB
-	sl0 temp_MSB
+	sl0 temp_msb
+	sl0 temp_msb
+	sl0 temp_msb
+	and temp_msb, 0b01111111 ;we have only 7 bits of decimal part, so always 0 at msb
 
-	load val, temp_LSB
-	or val, temp_MSB
+	load val, temp_lsb
+	or val, temp_msb
 	ret
