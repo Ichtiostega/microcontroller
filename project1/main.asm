@@ -9,13 +9,14 @@
 
 .reg s3, val
 .reg s4, tmp
-.reg s5, dec1
+.reg s5, char
 .reg s6, dec2
 
 .reg s7, temp_lsb
 .reg s8, temp_msb
 .reg s9, temp_bit
 
+.reg sA, float
 .reg sB, counter
 .reg sC, delay_counter
 .reg sD, delay_reg1u
@@ -37,19 +38,27 @@ main:
 
 	;test conversion
 	;load temp_lsb, 0b10100000
-	;load temp_msb, 0
+	;load temp_msb, 1
 	call temp_to_val
-	call val_to_chars
 
 	;eg. 12 C
-	load val, dec1
-	call write_val_to_lcd
-	load val, dec2
-	call write_val_to_lcd
-	load val, 0x20
-	call write_val_to_lcd
-	load val, 0x43
-	call write_val_to_lcd
+	call val_to_dec1_char
+	call write_char_to_lcd
+
+	call val_to_dec2_char
+	call write_char_to_lcd
+
+	load char, '.'
+	call write_char_to_lcd
+
+	call float_to_char
+	call write_char_to_lcd
+
+	load char, ' '
+	call write_char_to_lcd
+
+	load char, 'C'
+	call write_char_to_lcd
 
 	jump main
 

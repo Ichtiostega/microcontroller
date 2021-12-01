@@ -3,21 +3,33 @@ v1: .db "00000000001111111111222222222233333333334444444444555555555566666666667
 v2: .db "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
 
 .cseg
-val_to_chars:
+val_to_dec1_char:
 	load tmp, v1
 	add tmp, val
-	fetch dec1, tmp
+	fetch char, tmp
+	ret
+
+val_to_dec2_char:
 	load tmp, v2
 	add tmp, val
-	fetch dec2, tmp
+	fetch char, tmp
+	ret
+
+float_to_char:
+	load tmp, v2
+	add tmp, float
+	fetch char, tmp
 	ret
 
 temp_to_val:
+	load float, 0b00001111
+	and float, temp_lsb
 	sr0 temp_lsb
 	sr0 temp_lsb
 	sr0 temp_lsb
 	sr0 temp_lsb
 
+	sl0 temp_msb
 	sl0 temp_msb
 	sl0 temp_msb
 	sl0 temp_msb

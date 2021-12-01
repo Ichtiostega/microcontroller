@@ -32,7 +32,7 @@ clear_lcd:
 	ret
 
 set_cursor:
-	load tmp, 0xcc
+	load tmp, 0xca
 	out tmp, lcd_lv
 	call lcd_impulse
 	ret
@@ -47,8 +47,8 @@ unset_rs:
 	out rs, lcd_lc
 	ret
 
-write_val_to_lcd:
-	out val, lcd_lv
+write_char_to_lcd:
+	out char, lcd_lv
 	call lcd_impulse
 	ret
 
