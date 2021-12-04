@@ -17,7 +17,7 @@
 .reg s9, temp_bit
 
 .reg sA, float
-.reg sB, counter
+.reg sB, bit_counter
 .reg sC, delay_counter
 .reg sD, delay_reg1u
 .reg sE, delay_reg40u
@@ -36,12 +36,8 @@ main:
 	call set_cursor
 	call set_rs
 
-	;test conversion
-	;load temp_lsb, 0b10100000
-	;load temp_msb, 1
 	call temp_to_val
 
-	;eg. 12 C
 	call val_to_dec1_char
 	call write_char_to_lcd
 
