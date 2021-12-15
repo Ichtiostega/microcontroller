@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>LED_ON_LCD</Define>
+              <Define>LCD_ILI9325</Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
             </VariousControls>
@@ -386,6 +386,26 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>Open1768_LCD.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Open1768_LCD.c</FilePath>
+            </File>
+            <File>
+              <FileName>LCD_ILI9325.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD_ILI9325.c</FilePath>
+            </File>
+            <File>
+              <FileName>asciiLib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\asciiLib.c</FilePath>
+            </File>
+            <File>
+              <FileName>TP_Open1768.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\TP_Open1768.c</FilePath>
             </File>
           </Files>
         </Group>

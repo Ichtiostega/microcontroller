@@ -1,45 +1,30 @@
 #include "Board_LED.h"                  // ::Board Support:LED
 #include "Board_Joystick.h"             // ::Board Support:Joystick
-
 #include "LPC17xx.h"
-  
+#include "Open1768_LCD.h"
+#include "LCD_ILI9325.h"
+#include "asciiLib.h"
+#include "TP_Open1768.h"
+
+#include "stdio.h"
+
+uint8_t char_buf[16];
+uint8_t padding = 2;
+
 volatile uint32_t msTicks = 0;                              /* Variable to store millisecond ticks */
-  
-void SysTick_Handler(void)  {                               /* SysTick interrupt Handler. */
-  msTicks++;                                                /* See startup file startup_LPC17xx.s for SysTick vector */ 
-}
 
 void delay(uint32_t ms) {
 	uint32_t now = msTicks;
 	while(msTicks < now + ms);
 }
-
-int main(int argc, char ** argv)
+  
+void initialize()
 {
 	SysTick_Config(SystemCoreClock / 1000);
 	LED_Initialize();
-	Joystick_Initialize();
-	uint8_t i = 0;
-	uint32_t prev_state = Joystick_GetState();
-	while(1)
-	{
-		delay(10);
-		uint32_t state = Joystick_GetState();
-		if(state == prev_state)
-			continue;
-		prev_state = state;
-		if(state == JOYSTICK_DOWN)
-			i -= 10;
-		if(state == JOYSTICK_UP)
-			i += 10;
-		if(state == JOYSTICK_LEFT)
-			i--;
-		if(state == JOYSTICK_RIGHT)
-			i++;
-		LED_SetOut(i);
-	}
+	lcdConfiguration();
+	init_ILI9325();
 	
-	/*
 	LPC_UART0->LCR = 1 | (1<<1) | (1<<2) | (1<<7);
 	LPC_UART0->DLL = 10;
 	LPC_UART0->DLM = 0;
@@ -47,7 +32,18 @@ int main(int argc, char ** argv)
 	LPC_UART0->LCR ^= (1<<7);
 	LPC_PINCON->PINSEL0 = (1<<4) | (1<<6);
 	
-	char * str = "Ala ma kota, a kot ma Ale ";
+	LPC_PINCON->PINSEL4 = (1<<20);
+	LPC_SC->EXTMODE = 1;
+	LPC_SC->EXTPOLAR = 1;
+	LPC_SC->EXTINT = 1;
+	NVIC_EnableIRQ(EINT0_IRQn);
+	
+	LPC_GPIOINT->IO0IntEnF = (1<<19);
+	NVIC_EnableIRQ(EINT3_IRQn);
+}
+
+void print_uart(char * str)
+{
 	char * ptr = str;
 	while(*ptr != '\0')
 	{
@@ -57,18 +53,86 @@ int main(int argc, char ** argv)
 			ptr++;
 		}
 	}
+}
+
+void print_device_id()
+{
+	uint16_t device_id = lcdReadReg(OSCIL_ON);
+	char buffer[16];
+	sprintf(buffer, " 0x%x", device_id);
+	
+	print_uart(buffer);
+}
+
+void fill_bg(uint16_t color)
+{
+	lcdSetCursor(0,0);
+	for(int i=0; i<240*320; i++)
+		lcdWriteReg(DATA_RAM, color);
+}
+
+void print_char(uint16_t x, uint16_t y, unsigned char c, uint16_t color)
+{
+	GetASCIICode(0, char_buf, c);
+	for(int j=0; j<16; j++)
+	{
+		for(int i=0; i<8; i++)
+		{
+			if((char_buf[j] & (1<<i)) > 0)
+			{
+				lcdSetCursor(x+8-i,y+j);
+				lcdWriteReg(DATA_RAM, color);
+			}
+		}
+	}
+}
+
+void print_str(uint16_t x, uint16_t y, char * str, uint16_t color)
+{
+	int i = 0;
+	char * ptr = str;
+	while(*ptr != '\0')
+	{
+		print_char(x+i*8+i*padding, y, *ptr, color);
+		i++;
+		ptr++;
+	}
+}
+
+void print_coords()
+{
+	int x, y;
+	touchpanelGetXY(&x, &y);
+	char buf[15];
+	sprintf(buf, "(%d, %d)\r\n", x, y);
+	print_uart(buf);
+}
+
+void SysTick_Handler(void) {                                /* SysTick interrupt Handler. */
+  msTicks++;                                                /* See startup file startup_LPC17xx.s for SysTick vector */ 
+}
+
+void EINT0_IRQHandler(void) {
+	print_device_id();
+	LPC_SC->EXTINT = 1;
+}
+
+void EINT3_IRQHandler(void) {
+	print_uart("ASDF ");
+	LPC_GPIOINT->IO0IntClr = (1<<19);
+}
+
+int main(int argc, char ** argv)
+{
+	initialize();
+	/*print_device_id();
+	fill_bg(LCDBlack);
+	print_char(5,5,'a', LCDGreen);
+	print_str(5, 23, "Ala ma kota ", LCDGreen);*/
+		
+	touchpanelInit();
 	while(1)
 	{
-		if((LPC_UART0->LSR & 1 ) == 1)
-			LPC_UART0->THR = LPC_UART0->RBR + 1;
-	}
-	
-	*/
-	for(;;)
-	{
-		LED_SetOut(5+16+64);
-		delay(1000);
-		LED_SetOut(10+32+128);
-		delay(1000);
+		//print_coords();
 	}
 }
