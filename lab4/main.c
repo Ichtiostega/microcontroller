@@ -122,15 +122,37 @@ void EINT3_IRQHandler(void) {
 	LPC_GPIOINT->IO0IntClr = (1<<19);
 }
 
+uint32_t i = 1;
+
+void TIMER0_IRQHandler(void) {
+	LPC_TIM0->IR = 1;
+	
+	lcdSetCursor(0,0);
+	for(int i=0; i<21*240; i++)
+		lcdWriteReg(DATA_RAM, LCDBlack);
+	
+	char buf[15];
+	sprintf(buf, "%d", i);
+	print_str(5, 5, buf, LCDGreen);
+	i++;
+}
+
 int main(int argc, char ** argv)
 {
 	initialize();
-	/*print_device_id();
 	fill_bg(LCDBlack);
-	print_char(5,5,'a', LCDGreen);
-	print_str(5, 23, "Ala ma kota ", LCDGreen);*/
-		
-	touchpanelInit();
+	
+	// print_device_id();
+	// print_char(5,5,'a', LCDGreen);
+	// print_str(5, 23, "Ala ma kota ", LCDGreen);
+	// touchpanelInit();
+	
+	LPC_TIM0->PR = 0;
+	LPC_TIM0->MR0 = 12500000;
+	LPC_TIM0->MCR = (1 << 1) | (1 << 0);
+	LPC_TIM0->TCR = 1;
+	NVIC_EnableIRQ(TIMER0_IRQn);
+	
 	while(1)
 	{
 		//print_coords();
