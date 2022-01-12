@@ -11,4 +11,5 @@
 .\objects\main.o: LCD_ILI9325.h
 .\objects\main.o: Open1768_LCD.h
 .\objects\main.o: Time.h
+.\objects\main.o: 1_Wire.h
 .\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

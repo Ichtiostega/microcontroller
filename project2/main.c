@@ -1,5 +1,6 @@
 #include "LCD.h"
 #include "Time.h"
+#include "1_Wire.h"
 
 #include "LPC17xx.h"
 
@@ -7,6 +8,7 @@
 
 void init()
 {
+	init_gpio();
 	init_sys_tick();
 	init_lcd();
 }
@@ -17,10 +19,9 @@ int main(int argc, char ** argv)
 	
 	fill_bg(LCDBlack);
 	
-	uint8_t i = 0;
 	while(1) {
-		sleep_ms(1000);
-		i++;
-		print_temp(i, LCDGreen, LCDBlack);
+		uint16_t temp = read_temp();
+		sleep_ms(1000/60);
+		print_temp(temp, LCDGreen, LCDBlack);
 	}
 }

@@ -48,10 +48,32 @@ void print_str(uint16_t x, uint16_t y, char * str, uint16_t color)
 	}
 }
 
+uint16_t convert_temp_dec(uint16_t temp)
+{
+	temp = (temp>>4);
+	return temp & 127;
+}
+
+uint16_t convert_temp_float(uint16_t temp)
+{
+	return temp & 15;
+}
+
+char get_sign(uint16_t temp)
+{
+	if((temp & (1<<16)) > 0)
+		return '-';
+	return ' ';
+}
+
 void print_temp(uint16_t temp, uint16_t color, uint16_t bg_color) 
 {
 	char str_buf[16];
-	sprintf(str_buf, "%d C", temp);
+	sprintf(str_buf, "%c%d.%d C", 
+		get_sign(temp),
+		convert_temp_dec(temp), 
+		convert_temp_float(temp)
+	);
 	
 	lcdSetCursor(0, 5);
 	for(int i=0; i < 16 * 240; i++)
